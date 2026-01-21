@@ -1,32 +1,12 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Job } from "@/types/job";
-import { getJobs } from "@/lib/api";
 import JobCard from "./JobCard";
 
-const JobList: React.FC = () => {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+interface JobListProps {
+  jobs: Job[];
+}
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      const data = await getJobs();
-      setJobs(data);
-      setLoading(false);
-    };
-
-    fetchJobs();
-  }, []);
-
-  if (loading) {
-    return (
-      <p className="text-center text-gray-500 mt-10">
-        Loading job listings...
-      </p>
-    );
-  }
-
+const JobList: React.FC<JobListProps> = ({ jobs }) => {
   if (jobs.length === 0) {
     return (
       <p className="text-center text-gray-500 mt-10">

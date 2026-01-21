@@ -1,15 +1,21 @@
 "use client";
 
-type JobFiltersProps = {
-  category?: string;
-  location?: string;
-  experience?: string;
-};
+interface JobFiltersProps {
+  category: string;
+  location: string;
+  experience: string;
+  onCategoryChange: (value: string) => void;
+  onLocationChange: (value: string) => void;
+  onExperienceChange: (value: string) => void;
+}
 
 export default function JobFilters({
   category,
   location,
   experience,
+  onCategoryChange,
+  onLocationChange,
+  onExperienceChange,
 }: JobFiltersProps) {
   return (
     <div className="bg-white p-4 rounded-lg border mb-6">
@@ -21,7 +27,11 @@ export default function JobFilters({
           <label className="block text-sm font-medium mb-1">
             Category
           </label>
-          <select className="w-full border rounded-md px-3 py-2">
+          <select
+            value={category}
+            onChange={(e) => onCategoryChange(e.target.value)}
+            className="w-full border rounded-md px-3 py-2"
+          >
             <option value="">All Categories</option>
             <option>Engineering</option>
             <option>Design</option>
@@ -35,7 +45,11 @@ export default function JobFilters({
           <label className="block text-sm font-medium mb-1">
             Location
           </label>
-          <select className="w-full border rounded-md px-3 py-2">
+          <select
+            value={location}
+            onChange={(e) => onLocationChange(e.target.value)}
+            className="w-full border rounded-md px-3 py-2"
+          >
             <option value="">All Locations</option>
             <option>Lagos</option>
             <option>Abuja</option>
@@ -48,7 +62,11 @@ export default function JobFilters({
           <label className="block text-sm font-medium mb-1">
             Experience Level
           </label>
-          <select className="w-full border rounded-md px-3 py-2">
+          <select
+            value={experience}
+            onChange={(e) => onExperienceChange(e.target.value)}
+            className="w-full border rounded-md px-3 py-2"
+          >
             <option value="">All Levels</option>
             <option>Entry</option>
             <option>Mid</option>

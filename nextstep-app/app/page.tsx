@@ -1,22 +1,64 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getJobs } from "@/lib/api";
+import { Job } from "@/types/job";
 import JobList from "@/components/jobs/JobList";
+import JobFilters from "@/components/jobs/JobFilters";
 
 export default function HomePage() {
-  return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8">
-      {/* Header */}
-      <section className="max-w-5xl mx-auto mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-          Find Your Next Job
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Browse opportunities tailored for you
-        </p>
-      </section>
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
 
-      {/* Job Listings */}
-      <section className="max-w-5xl mx-auto">
-        <JobList />
-      </section>
+  const [category, setCategory] = useState("");
+  const [location, setLocation] = useState("");
+  const [experience, setExperience] = useState("");
+
+  useEffect(() => {
+    async function fetchJobs() {
+      const data = await getJobs();
+      setJobs(data);
+      setFilteredJobs(data);
+    }
+    fetchJobs();
+  }, []);
+
+  useEffect(() => {
+    let result = jobs;
+
+    if (category) {
+      result = result.filter(
+        (job) => job.category === category
+      );
+    }
+
+    if (location) {
+      result = result.filter(
+        (job) => job.location.includes(location)
+      );
+    }
+
+    if (experience) {
+      result = result.filter(
+        (job) => job.experienceLevel === experience
+      );
+    }
+
+    setFilteredJobs(result);
+  }, [category, location, experience, jobs]);
+
+  return (
+    <main className="max-w-7xl mx-auto px-6 py-8">
+      <JobFilters
+        category={category}
+        location={location}
+        experience={experience}
+        onCategoryChange={setCategory}
+        onLocationChange={setLocation}
+        onExperienceChange={setExperience}
+      />
+
+      <JobList jobs={filteredJobs} />
     </main>
   );
 }

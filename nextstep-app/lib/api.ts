@@ -8,9 +8,7 @@ export const getJobs = async (): Promise<Job[]> => {
   });
 };
 
-// Fetch a single job by ID
-export const getJobById = async (id: string): Promise<Job | undefined> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(jobs.find((job) => job.id === id)), 300);
-  });
-};
+export async function getJobById(id: string): Promise<Job | undefined> {
+  return jobs.find((job) => job.id === id);
+}
+
