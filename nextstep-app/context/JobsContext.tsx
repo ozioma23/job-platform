@@ -14,6 +14,9 @@ interface JobsContextType {
   setLocation: (value: string) => void;
   setExperience: (value: string) => void;
   clearFilters: () => void;
+  savedJobs: Job[];                
+  saveJob: (job: Job) => void;      
+  unsaveJob: (jobId: string) => void; 
 }
 
 const JobsContext = createContext<JobsContextType | undefined>(undefined);
@@ -25,6 +28,9 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [experience, setExperience] = useState("");
+
+
+  const [savedJobs, setSavedJobs] = useState<Job[]>([]);
 
   // Fetch jobs on mount
   useEffect(() => {
@@ -55,10 +61,24 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     setFilteredJobs(result);
   }, [category, location, experience, jobs]);
 
+  // Clear filters
   const clearFilters = () => {
     setCategory("");
     setLocation("");
     setExperience("");
+  };
+
+   const saveJob = (job: Job) => {
+    setSavedJobs((prev) => {
+      if (!prev.find((j) => j.id === job.id)) {
+        return [...prev, job]; // add if not already saved
+      }
+      return prev; 
+    });
+  };
+
+   const unsaveJob = (jobId: string) => {
+    setSavedJobs((prev) => prev.filter((job) => job.id !== jobId));
   };
 
   return (
@@ -73,6 +93,9 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
         setLocation,
         setExperience,
         clearFilters,
+        savedJobs,  
+        saveJob,    
+        unsaveJob,   
       }}
     >
       {children}
