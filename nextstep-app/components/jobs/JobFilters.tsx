@@ -7,6 +7,7 @@ interface JobFiltersProps {
   onCategoryChange: (value: string) => void;
   onLocationChange: (value: string) => void;
   onExperienceChange: (value: string) => void;
+  onClearFilters: () => void;
 }
 
 export default function JobFilters({
@@ -16,6 +17,7 @@ export default function JobFilters({
   onCategoryChange,
   onLocationChange,
   onExperienceChange,
+  onClearFilters,
 }: JobFiltersProps) {
   return (
     <div className="bg-white p-4 rounded-lg border mb-6">
@@ -24,9 +26,7 @@ export default function JobFilters({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Category
-          </label>
+          <label className="block text-sm font-medium mb-1">Category</label>
           <select
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
@@ -42,9 +42,7 @@ export default function JobFilters({
 
         {/* Location */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Location
-          </label>
+          <label className="block text-sm font-medium mb-1">Location</label>
           <select
             value={location}
             onChange={(e) => onLocationChange(e.target.value)}
@@ -59,9 +57,7 @@ export default function JobFilters({
 
         {/* Experience */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Experience Level
-          </label>
+          <label className="block text-sm font-medium mb-1">Experience Level</label>
           <select
             value={experience}
             onChange={(e) => onExperienceChange(e.target.value)}
@@ -73,6 +69,16 @@ export default function JobFilters({
             <option>Senior</option>
           </select>
         </div>
+      </div>
+
+      {/* Clear Filters Button */}
+      <div className="mt-4 flex justify-end">
+        <button
+          onClick={onClearFilters}
+          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+        >
+          Clear Filters
+        </button>
       </div>
     </div>
   );
