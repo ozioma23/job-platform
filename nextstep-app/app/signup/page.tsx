@@ -1,37 +1,82 @@
 "use client";
 
+import React, { useState } from "react";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai"; 
+
 export default function SignupPage() {
+  const { signup } = useUser();
+  const router = useRouter();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); 
+  const [error, setError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const newUser = { username: name, email, password };
+    signup(newUser);
+    router.push("/"); 
+  };
+
   return (
-    <main className="min-h-[70vh] flex items-center justify-center px-6">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg border">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Create Account
-        </h1>
+    <main className="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <input
+          type="text"
+          placeholder="Full Name"
+          className="p-3 border rounded"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          className="p-3 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <form className="space-y-4">
+        {/* Password field with eye icon */}
+        <div className="relative">
           <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full border rounded-md px-4 py-2"
-          />
-
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full border rounded-md px-4 py-2"
-          />
-
-          <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className="w-full border rounded-md px-4 py-2"
+            className="p-3 border rounded w-full"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
-
-          <button className="w-full bg-black text-white py-2 rounded-md">
-            Sign up
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-800"
+          >
+            {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
           </button>
-        </form>
-      </div>
+        </div>
+
+        <button
+          type="submit"
+          className="bg-purple-600 text-white p-3 rounded hover:bg-purple-700 transition"
+        >
+          Sign Up
+        </button>
+      </form>
+
+      <p className="mt-4 text-sm text-center">
+        Already have an account?{" "}
+        <a href="/login" className="text-blue-600 hover:underline">
+          Log in
+        </a>
+      </p>
     </main>
   );
 }

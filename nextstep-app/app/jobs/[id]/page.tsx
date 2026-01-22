@@ -2,13 +2,15 @@
 
 import React from "react";
 import { useJobs } from "@/context/JobsContext";
+import { useUser } from "@/context/UserContext";
 import { useParams, useRouter } from "next/navigation";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Link from "next/link";
 
 export default function JobDetailsPage() {
-  const { filteredJobs, savedJobs, saveJob, unsaveJob, applyJob, appliedJobs } = useJobs();
+  const { filteredJobs, savedJobs, saveJob, unsaveJob, appliedJobs, applyJob } = useJobs();
+  const { user } = useUser(); // <-- check if user is logged in
   const params = useParams();
   const jobId = params.id as string;
   const router = useRouter();
@@ -19,9 +21,7 @@ export default function JobDetailsPage() {
     return (
       <main className="max-w-3xl mx-auto px-6 py-16 text-center">
         <p className="text-gray-500">Job not found.</p>
-        <Link href="/" className="text-blue-600 mt-4 inline-block">
-          Back to Home
-        </Link>
+        <Link href="/" className="text-blue-600 mt-4 inline-block">Back to Home</Link>
       </main>
     );
   }
@@ -35,8 +35,13 @@ export default function JobDetailsPage() {
   };
 
   const handleApplyClick = () => {
+    if (!user) {
+      alert("You must log in or sign up to apply for jobs.");
+      return;
+    }
+
     if (!isApplied) {
-      applyJob(job); 
+      applyJob(job);
       alert("You have successfully applied for this job!");
     } else {
       alert("You have already applied to this job.");
@@ -49,9 +54,7 @@ export default function JobDetailsPage() {
       <div className="lg:col-span-2 space-y-6">
         <div>
           <h1 className="text-3xl font-bold">{job.title}</h1>
-          <p className="text-gray-600 mt-1">
-            {job.company} • {job.location}
-          </p>
+          <p className="text-gray-600 mt-1">{job.company} • {job.location}</p>
         </div>
 
         <div className="space-y-4">
@@ -84,13 +87,10 @@ export default function JobDetailsPage() {
         </div>
 
         <div className="flex gap-4 mt-4">
-          <Button onClick={handleSaveClick}>
-            {isSaved ? "Unsave Job" : "Save Job"}
-          </Button>
+          <Button onClick={handleSaveClick}>{isSaved ? "Unsave Job" : "Save Job"}</Button>
           <Button onClick={handleApplyClick} disabled={isApplied}>
             {isApplied ? "Already Applied" : "Apply Now"}
           </Button>
-          
         </div>
       </div>
 
