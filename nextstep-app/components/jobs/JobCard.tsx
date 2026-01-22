@@ -12,16 +12,24 @@ interface JobCardProps {
 }
 
 const JobCard: React.FC<JobCardProps> = ({ job }) => {
-  const { savedJobs, saveJob, unsaveJob } = useJobs();
+  const { savedJobs, saveJob, unsaveJob, appliedJobs, applyJob } = useJobs();
 
   const isSaved = savedJobs.some((j) => j.id === job.id);
+  const isApplied = appliedJobs.some((j) => j.id === job.id);
 
   const handleSaveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent navigating to Job Details
-    if (isSaved) {
-      unsaveJob(job.id);
+    if (isSaved) unsaveJob(job.id);
+    else saveJob(job);
+  };
+
+  const handleApplyClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation(); // Prevent navigating when clicking button
+    if (!isApplied) {
+      applyJob(job);
+      alert("You have successfully applied for this job!");
     } else {
-      saveJob(job);
+      alert("You have already applied to this job.");
     }
   };
 
@@ -50,8 +58,8 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
         <Button onClick={handleSaveClick}>
           {isSaved ? "Unsave" : "Save Job"}
         </Button>
-        <Button onClick={() => alert("Apply feature coming soon!")}>
-          Apply Now
+        <Button onClick={handleApplyClick} disabled={isApplied}>
+          {isApplied ? "Already Applied" : "Apply Now"}
         </Button>
       </div>
     </div>

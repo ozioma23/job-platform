@@ -8,10 +8,10 @@ import Button from "@/components/ui/Button";
 import Link from "next/link";
 
 export default function JobDetailsPage() {
-  const { filteredJobs, savedJobs, saveJob, unsaveJob, appliedJobs, applyJob } = useJobs();
+  const { filteredJobs, savedJobs, saveJob, unsaveJob, applyJob, appliedJobs } = useJobs();
   const params = useParams();
-  const router = useRouter();
   const jobId = params.id as string;
+  const router = useRouter();
 
   const job = filteredJobs.find((j) => j.id === jobId);
 
@@ -19,51 +19,47 @@ export default function JobDetailsPage() {
     return (
       <main className="max-w-3xl mx-auto px-6 py-16 text-center">
         <p className="text-gray-500">Job not found.</p>
-        <Link href="/" className="text-blue-600 mt-4 inline-block hover:underline">
+        <Link href="/" className="text-blue-600 mt-4 inline-block">
           Back to Home
         </Link>
       </main>
     );
   }
 
-  // Check if job is saved
   const isSaved = savedJobs.some((j) => j.id === job.id);
-
-  // Check if job is applied
   const isApplied = appliedJobs.some((j) => j.id === job.id);
 
   const handleSaveClick = () => {
-    if (isSaved) {
-      unsaveJob(job.id);
-    } else {
-      saveJob(job);
-    }
+    if (isSaved) unsaveJob(job.id);
+    else saveJob(job);
   };
 
   const handleApplyClick = () => {
     if (!isApplied) {
-      applyJob(job);
-      alert("You have successfully applied to this job!");
+      applyJob(job); 
+      alert("You have successfully applied for this job!");
+    } else {
+      alert("You have already applied to this job.");
     }
   };
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* MAIN CONTENT */}
+      {/* Main Content */}
       <div className="lg:col-span-2 space-y-6">
         <div>
           <h1 className="text-3xl font-bold">{job.title}</h1>
-          <p className="text-gray-600 mt-1">{job.company} • {job.location}</p>
+          <p className="text-gray-600 mt-1">
+            {job.company} • {job.location}
+          </p>
         </div>
 
         <div className="space-y-4">
-          {/* Job Description */}
           <section>
             <h2 className="text-xl font-semibold mb-2">Job Description</h2>
             <p className="text-gray-700">{job.description || "No description provided."}</p>
           </section>
 
-          {/* Responsibilities */}
           {job.responsibilities && (
             <section>
               <h2 className="text-xl font-semibold mb-2">Responsibilities</h2>
@@ -75,7 +71,6 @@ export default function JobDetailsPage() {
             </section>
           )}
 
-          {/* Requirements */}
           {job.requirements && (
             <section>
               <h2 className="text-xl font-semibold mb-2">Requirements</h2>
@@ -88,23 +83,18 @@ export default function JobDetailsPage() {
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-4">
+        <div className="flex gap-4 mt-4">
           <Button onClick={handleSaveClick}>
             {isSaved ? "Unsave Job" : "Save Job"}
           </Button>
-
-          <Button
-            onClick={handleApplyClick}
-            disabled={isApplied}
-            className={isApplied ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed" : ""}
-          >
-            {isApplied ? "Applied" : "Apply Now"}
+          <Button onClick={handleApplyClick} disabled={isApplied}>
+            {isApplied ? "Already Applied" : "Apply Now"}
           </Button>
+          
         </div>
       </div>
 
-      {/* SIDEBAR */}
+      {/* Sidebar */}
       <aside className="bg-white border rounded-lg p-6 space-y-4 h-fit">
         <h3 className="text-lg font-semibold">Job Summary</h3>
         <div className="text-sm space-y-2">
