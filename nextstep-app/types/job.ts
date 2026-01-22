@@ -4,10 +4,14 @@ export interface Job {
   company: string;
   location: string;
   category: string;
-  experienceLevel: "Entry" | "Mid" | "Senior";
-  description: string;
-  postedAt: string;
-  logoUrl?: string;
+  experienceLevel: string;
   isRemote: boolean;
-  salaryRange: string;
+
+  // Optional fields
+  description?: string;
+  responsibilities?: string[];
+  requirements?: string[];
+  type?: string;       // e.g., Full-time, Part-time
+  salary?: string;     // e.g., $50,000 - $60,000
+  postedAt?: string;   // e.g., "2 days ago"
 }
