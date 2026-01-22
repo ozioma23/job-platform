@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { Job } from "@/types/job";
 import { getJobs } from "@/lib/api";
+import { Application } from "@/types/application";
+import { User } from "@/types/user";
 
 interface JobsContextType {
   jobs: Job[];
@@ -17,8 +19,11 @@ interface JobsContextType {
   savedJobs: Job[];
   saveJob: (job: Job) => void;
   unsaveJob: (jobId: string) => void;
-  appliedJobs: Job[];               // NEW
-  applyJob: (job: Job) => void;      // NEW
+  appliedJobs: Job[];               
+  applyJob: (job: Job) => void;     
+  applications: Application[];
+applyToJob: (job: Job, user: User) => void;
+
 }
 
 const JobsContext = createContext<JobsContextType | undefined>(undefined);
@@ -31,7 +36,8 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const [experience, setExperience] = useState("");
 
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
-  const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);  // NEW
+  const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);  
+  const [applications, setApplications] = useState<Application[]>([]);
 
   // Fetch jobs on mount
   useEffect(() => {
@@ -71,13 +77,32 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     setSavedJobs((prev) => prev.filter((job) => job.id !== jobId));
   };
 
-  // NEW: Apply to job
+  
   const applyJob = (job: Job) => {
     setAppliedJobs((prev) => {
       if (!prev.find((j) => j.id === job.id)) return [...prev, job];
       return prev;
     });
   };
+
+  const applyToJob = (job: Job, user: User) => {
+  setApplications((prev) => {
+    // Prevent duplicate applications by same user
+    if (!prev.find((app) => app.job.id === job.id && app.user.id === user.id)) {
+      return [
+        ...prev,
+        {
+          id: `${job.id}-${user.id}`,
+          job,
+          user,
+          appliedAt: new Date().toISOString(),
+          status: "Pending",
+        },
+      ];
+    }
+    return prev;
+  });
+};
 
   return (
     <JobsContext.Provider
@@ -94,8 +119,10 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
         savedJobs,
         saveJob,
         unsaveJob,
-        appliedJobs,   // NEW
-        applyJob,      // NEW
+        appliedJobs,   
+        applyJob,      
+        applications,  
+    applyToJob, 
       }}
     >
       {children}
