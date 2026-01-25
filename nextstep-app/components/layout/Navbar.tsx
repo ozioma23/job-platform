@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useJobs } from "@/context/JobsContext";
+import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
   const { savedJobs } = useJobs();
-  const isLoggedIn = false;
+  const { user, logout } = useUser();
 
   return (
     <nav className="w-full bg-white py-4">
@@ -14,7 +15,7 @@ export default function Navbar() {
           
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg ">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg">
               <img
                 src="/logo.png"
                 alt="NextStep logo"
@@ -52,21 +53,43 @@ export default function Navbar() {
             </li>
           </ul>
 
-          {/* Auth */}
+          {/* Auth Section */}
           <div className="flex items-center gap-6 text-sm font-medium">
-            <Link
-              href="/login"
-              className="text-gray-700 hover:text-[#5B5AF7]"
-            >
-              Login
-            </Link>
+            {user ? (
+              <>
+                {/* Profile Icon */}
+                <Link
+                  href="/profile"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#5B5AF7] text-white font-semibold"
+                >
+                  {user.username.charAt(0).toUpperCase()}
+                </Link>
 
-            <Link
-              href="/signup"
-              className="rounded-lg bg-[#5B5AF7] px-5 py-2 text-white hover:opacity-90"
-            >
-              Sign Up
-            </Link>
+                {/* Logout */}
+                <button
+                  onClick={logout}
+                  className="text-gray-500 hover:text-red-500"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-700 hover:text-[#5B5AF7]"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  href="/signup"
+                  className="rounded-lg bg-[#5B5AF7] px-5 py-2 text-white hover:opacity-90"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

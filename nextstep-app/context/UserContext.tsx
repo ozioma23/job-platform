@@ -20,30 +20,43 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // Load user from localStorage on mount
+  // Load logged-in user on app load
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = localStorage.getItem("loggedInUser");
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
   }, []);
 
   const signup = (newUser: User) => {
+    // save registered user
+    localStorage.setItem("registeredUser", JSON.stringify(newUser));
+
+    // auto login after signup
+    localStorage.setItem("loggedInUser", JSON.stringify(newUser));
     setUser(newUser);
-    localStorage.setItem("user", JSON.stringify(newUser));
-    return true; // success
+
+    return true;
   };
 
   const login = (email: string, password: string) => {
-    if (user && user.email === email && user.password === password) {
-      return true; // success
+    const storedUser = localStorage.getItem("registeredUser");
+    if (!storedUser) return false;
+
+    const parsedUser: User = JSON.parse(storedUser);
+
+    if (parsedUser.email === email && parsedUser.password === password) {
+      setUser(parsedUser);
+      localStorage.setItem("loggedInUser", JSON.stringify(parsedUser));
+      return true;
     }
-    return false; // failed
+
+    return false;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    localStorage.removeItem("loggedInUser");
   };
 
   return (
