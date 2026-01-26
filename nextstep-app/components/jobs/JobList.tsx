@@ -9,14 +9,14 @@ interface JobListProps {
 const JobList: React.FC<JobListProps> = ({ jobs }) => {
   if (jobs.length === 0) {
     return (
-      <p className="text-center text-gray-500 mt-10">
+      <p className="mt-10 text-center text-gray-500">
         No jobs available at the moment.
       </p>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {jobs.map((job) => (
         <JobCard key={job.id} job={job} />
       ))}

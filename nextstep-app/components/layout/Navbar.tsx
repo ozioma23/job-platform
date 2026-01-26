@@ -14,18 +14,17 @@ export default function Navbar() {
         <div className="flex items-center justify-between rounded-xl bg-white px-6 py-4 shadow-sm">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg">
-              <img
-                src="/logo.png"
-                alt="NextStep logo"
-                className="h-10 w-5"
-              />
-            </div>
-            <span className="text-lg font-semibold text-[#5B5AF7]">
-              NextStep
-            </span>
-          </Link>
+<Link href="/" className="flex items-center gap-3">
+  <img
+    src="/logo.png"
+    alt="NextStep logo"
+    className="h-12 w-auto object-contain"
+  />
+  <span className="text-xl font-semibold text-[#5B5AF7]">
+    NextStep
+  </span>
+</Link>
+
 
           {/* Navigation */}
           <ul className="flex items-center gap-8 text-sm font-medium text-gray-700">

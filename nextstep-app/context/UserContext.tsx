@@ -13,6 +13,7 @@ interface UserContextType {
   signup: (user: User) => boolean;
   login: (email: string, password: string) => boolean;
   logout: () => void;
+  updateUser: (user: User) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -20,7 +21,6 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  // Load logged-in user on app load
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedInUser");
     if (savedUser) {
@@ -29,13 +29,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signup = (newUser: User) => {
-    // save registered user
     localStorage.setItem("registeredUser", JSON.stringify(newUser));
-
-    // auto login after signup
     localStorage.setItem("loggedInUser", JSON.stringify(newUser));
     setUser(newUser);
-
     return true;
   };
 
@@ -59,8 +55,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("loggedInUser");
   };
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+    localStorage.setItem("registeredUser", JSON.stringify(updatedUser));
+  };
+
   return (
-    <UserContext.Provider value={{ user, signup, login, logout }}>
+    <UserContext.Provider value={{ user, signup, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );
