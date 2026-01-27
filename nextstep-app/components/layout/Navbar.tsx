@@ -14,13 +14,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between rounded-xl bg-white px-6 py-4 shadow-sm">
           
           {/* Logo */}
-<Link href="/" className="flex items-center gap-3">
+<Link href="/" className="flex items-center ">
   <img
     src="/logo.png"
     alt="NextStep logo"
     className="h-12 w-auto object-contain"
   />
-  <span className="text-xl font-semibold text-[#5B5AF7]">
+  <span className="text-xl font-semibold text-purple-700">
     NextStep
   </span>
 </Link>
@@ -29,13 +29,13 @@ export default function Navbar() {
           {/* Navigation */}
           <ul className="flex items-center gap-8 text-sm font-medium text-gray-700">
             <li>
-              <Link href="/" className="hover:text-[#5B5AF7]">
+              <Link href="/" className="hover:text-purple-700">
                 Jobs
               </Link>
             </li>
 
             <li>
-              <Link href="/saved" className="hover:text-[#5B5AF7]">
+              <Link href="/saved" className="hover:text-purple-700">
                 Saved Jobs
                 {savedJobs.length > 0 && (
                   <span className="ml-1 text-xs font-semibold text-gray-500">
@@ -46,7 +46,7 @@ export default function Navbar() {
             </li>
 
             <li>
-              <Link href="/applications" className="hover:text-[#5B5AF7]">
+              <Link href="/applications" className="hover:text-purple-700">
                 Applications
               </Link>
             </li>
@@ -59,7 +59,7 @@ export default function Navbar() {
                 {/* Profile Icon */}
                 <Link
                   href="/profile"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#5B5AF7] text-white font-semibold"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-purple-700 text-white font-semibold"
                 >
                   {user.username.charAt(0).toUpperCase()}
                 </Link>
@@ -76,14 +76,14 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-700 hover:text-[#5B5AF7]"
+                  className="text-gray-700 hover:text-purple-700"
                 >
                   Login
                 </Link>
 
                 <Link
                   href="/signup"
-                  className="rounded-lg bg-[#5B5AF7] px-5 py-2 text-white hover:opacity-90"
+                  className="rounded-lg bg-purple-700 px-5 py-2 text-white hover:opacity-90"
                 >
                   Sign Up
                 </Link>

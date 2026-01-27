@@ -20,37 +20,19 @@ export default function JobFilters({
   onClearFilters,
 }: JobFiltersProps) {
   return (
-    <div className="sticky top-24 rounded-2xl border bg-white p-6">
-      <h2 className="mb-6 text-lg font-semibold text-gray-800">
-        Filters
-      </h2>
+    <div className="bg-white p-4 rounded-lg border mb-6">
+      <h2 className="text-lg font-semibold mb-4">Filter Jobs</h2>
 
-      <div className="space-y-6">
-        {/* Location */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Category */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Location
-          </label>
-          <input
-            type="text"
-            placeholder="e.g., San Francisco"
-            value={location}
-            onChange={(e) => onLocationChange(e.target.value)}
-            className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#5B5AF7]"
-          />
-        </div>
-
-        {/* Job Type / Category */}
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Job Type
-          </label>
+          <label className="block text-sm font-medium mb-1">Category</label>
           <select
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#5B5AF7]"
+            className="w-full border rounded-md px-3 py-2"
           >
-            <option value="">All</option>
+            <option value="">All Categories</option>
             <option>Engineering</option>
             <option>Design</option>
             <option>Marketing</option>
@@ -58,27 +40,42 @@ export default function JobFilters({
           </select>
         </div>
 
+        {/* Location */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Location</label>
+          <select
+            value={location}
+            onChange={(e) => onLocationChange(e.target.value)}
+            className="w-full border rounded-md px-3 py-2"
+          >
+            <option value="">All Locations</option>
+            <option>Lagos</option>
+            <option>Abuja</option>
+            <option>Remote</option>
+          </select>
+        </div>
+
         {/* Experience */}
         <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Experience Level
-          </label>
+          <label className="block text-sm font-medium mb-1">Experience Level</label>
           <select
             value={experience}
             onChange={(e) => onExperienceChange(e.target.value)}
-            className="w-full rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#5B5AF7]"
+            className="w-full border rounded-md px-3 py-2"
           >
-            <option value="">All</option>
+            <option value="">All Levels</option>
             <option>Entry</option>
             <option>Mid</option>
             <option>Senior</option>
           </select>
         </div>
+      </div>
 
-        {/* Clear */}
+      {/* Clear Filters Button */}
+      <div className="mt-4 flex justify-end">
         <button
           onClick={onClearFilters}
-          className="w-full rounded-lg bg-gray-100 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition"
+          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition"
         >
           Clear Filters
         </button>

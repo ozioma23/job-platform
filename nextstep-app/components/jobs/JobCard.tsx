@@ -1,75 +1,139 @@
 "use client";
 
-import React from "react";
 import { Job } from "@/types/job";
-import Badge from "../ui/Badge";
-import Button from "../ui/Button";
 import { useJobs } from "@/context/JobsContext";
 import { useUser } from "@/context/UserContext";
 import Link from "next/link";
+import { Briefcase, Clock } from "lucide-react";
 
 interface JobCardProps {
   job: Job;
 }
 
-const JobCard: React.FC<JobCardProps> = ({ job }) => {
-  const { savedJobs, saveJob, unsaveJob, appliedJobs, applyJob } = useJobs();
-  const { user } = useUser(); // <-- get user state
+export default function JobCard({ job }: JobCardProps) {
+  const {
+    appliedJobs,
+    applyJob,
+    savedJobs,
+    saveJob,
+    unsaveJob,
+  } = useJobs();
 
-  const isSaved = savedJobs.some((j) => j.id === job.id);
+  const { user } = useUser();
+
   const isApplied = appliedJobs.some((j) => j.id === job.id);
+  const isSaved = savedJobs.some((j) => j.id === job.id);
 
-  const handleSaveClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    if (isSaved) unsaveJob(job.id);
-    else saveJob(job);
-  };
-
-  const handleApplyClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleApply = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
-      alert("You must log in or sign up to apply for jobs.");
+      alert("Please log in or sign up to apply.");
       return;
     }
 
     if (!isApplied) {
       applyJob(job);
-      alert("You have successfully applied for this job!");
+    }
+  };
+
+  const handleSave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isSaved) {
+      unsaveJob(job.id);
     } else {
-      alert("You have already applied to this job.");
+      saveJob(job);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 flex flex-col md:flex-row justify-between gap-4 hover:shadow-lg transition-shadow cursor-pointer">
-      
-      {/* LEFT: Clickable Job Info */}
-      <Link href={`/jobs/${job.id}`} className="flex flex-1 flex-col md:flex-row gap-2">
-        <div className="flex flex-col md:flex-1 gap-2">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{job.title}</h2>
-          <p className="text-gray-600 dark:text-gray-300">{job.company}</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">{job.location}</p>
+    <Link
+      href={`/jobs/${job.id}`}
+      className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition"
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900">
+            {job.title}
+          </h3>
 
-          <div className="flex flex-wrap gap-2 mt-2">
-            <Badge>{job.category}</Badge>
-            <Badge>{job.experienceLevel}</Badge>
-            {job.isRemote && <Badge>Remote</Badge>}
-          </div>
+          <p className="mt-1 text-sm text-gray-600">
+            {job.company} • {job.location}
+          </p>
         </div>
-      </Link>
 
-      {/* RIGHT: Buttons */}
-      <div className="flex flex-col items-end justify-center gap-2">
-        <Button onClick={handleSaveClick}>
-          {isSaved ? "Unsave" : "Save Job"}
-        </Button>
-        <Button onClick={handleApplyClick} disabled={isApplied}>
-          {isApplied ? "Already Applied" : "Apply Now"}
-        </Button>
+        {job.type && (
+          <span className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+            <Briefcase size={14} />
+            {job.type}
+          </span>
+        )}
       </div>
-    </div>
-  );
-};
 
-export default JobCard;
+      {/* Description */}
+      {job.description && (
+        <p className="mt-4 text-sm text-gray-600 line-clamp-3">
+          {job.description}
+        </p>
+      )}
+
+      {/* Tags */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        {job.category && (
+          <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-purple-600">
+            {job.category}
+          </span>
+        )}
+        {job.experienceLevel && (
+          <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-purple-600">
+            {job.experienceLevel}
+          </span>
+        )}
+        {job.isRemote && (
+          <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-purple-600">
+            Remote
+          </span>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-6 flex items-center justify-between">
+        <span className="flex items-center gap-1 text-xs text-gray-400">
+          <Clock size={14} />
+          {job.postedAt ?? "Recently posted"}
+        </span>
+
+        <div className="flex gap-3">
+          <button
+            onClick={handleSave}
+            className={`rounded-lg border px-5 py-2 text-sm font-medium
+              ${
+                isSaved
+                  ? "border-purple-600 text-purple-600"
+                  : "border-gray-300 text-gray-600 hover:border-purple-600 hover:text-purple-600"
+              }`}
+          >
+            {isSaved ? "Saved" : "Save"}
+          </button>
+
+          <button
+            onClick={handleApply}
+            disabled={isApplied}
+            className={`rounded-lg px-6 py-2 text-sm font-medium text-white
+              ${
+                isApplied
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-purple-600 hover:bg-indigo-700"
+              }`}
+          >
+            {isApplied ? "Applied" : "Apply Now"}
+          </button>
+        </div>
+      </div>
+    </Link>
+  );
+}

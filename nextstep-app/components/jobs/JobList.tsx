@@ -9,7 +9,7 @@ interface JobListProps {
 const JobList: React.FC<JobListProps> = ({ jobs }) => {
   if (jobs.length === 0) {
     return (
-      <p className="mt-10 text-center text-gray-500">
+      <p className="col-span-full text-center text-gray-500 mt-10">
         No jobs available at the moment.
       </p>
     );

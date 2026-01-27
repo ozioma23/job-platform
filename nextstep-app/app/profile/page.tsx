@@ -35,7 +35,7 @@ export default function ProfilePage() {
           
           {/* Header */}
           <div className="flex items-center gap-6 border-b pb-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#5B5AF7] text-3xl font-bold text-white">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-purple-700 text-3xl font-bold text-white">
               {user.username.charAt(0).toUpperCase()}
             </div>
 
