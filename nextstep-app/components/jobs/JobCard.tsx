@@ -8,9 +8,10 @@ import { Briefcase, Clock } from "lucide-react";
 
 interface JobCardProps {
   job: Job;
+  variant?: "default" | "saved";
 }
 
-export default function JobCard({ job }: JobCardProps) {
+export default function JobCard({ job, variant = "default" }: JobCardProps) {
   const {
     appliedJobs,
     applyJob,
@@ -52,9 +53,9 @@ export default function JobCard({ job }: JobCardProps) {
   return (
     <Link
       href={`/jobs/${job.id}`}
-      className="rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition"
+      className="block rounded-2xl border bg-white p-6 shadow-sm hover:shadow-md transition"
     >
-      {/* Header */}
+     
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
@@ -74,14 +75,14 @@ export default function JobCard({ job }: JobCardProps) {
         )}
       </div>
 
-      {/* Description */}
+      
       {job.description && (
         <p className="mt-4 text-sm text-gray-600 line-clamp-3">
           {job.description}
         </p>
       )}
 
-      {/* Tags */}
+     
       <div className="mt-4 flex flex-wrap gap-2">
         {job.category && (
           <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-purple-600">
@@ -100,7 +101,7 @@ export default function JobCard({ job }: JobCardProps) {
         )}
       </div>
 
-      {/* Footer */}
+     
       <div className="mt-6 flex items-center justify-between">
         <span className="flex items-center gap-1 text-xs text-gray-400">
           <Clock size={14} />
@@ -108,30 +109,43 @@ export default function JobCard({ job }: JobCardProps) {
         </span>
 
         <div className="flex gap-3">
-          <button
-            onClick={handleSave}
-            className={`rounded-lg border px-5 py-2 text-sm font-medium
-              ${
-                isSaved
-                  ? "border-purple-600 text-purple-600"
-                  : "border-gray-300 text-gray-600 hover:border-purple-600 hover:text-purple-600"
-              }`}
-          >
-            {isSaved ? "Saved" : "Save"}
-          </button>
+          {variant === "saved" ? (
+           
+            <button
+              onClick={handleSave}
+              className="rounded-lg border border-red-500 px-6 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+            >
+              Remove
+            </button>
+          ) : (
+           
+            <>
+              <button
+                onClick={handleSave}
+                className={`rounded-lg border px-5 py-2 text-sm font-medium
+                  ${
+                    isSaved
+                      ? "border-purple-600 text-purple-600"
+                      : "border-gray-300 text-gray-600 hover:border-purple-600 hover:text-purple-600"
+                  }`}
+              >
+                {isSaved ? "Saved" : "Save"}
+              </button>
 
-          <button
-            onClick={handleApply}
-            disabled={isApplied}
-            className={`rounded-lg px-6 py-2 text-sm font-medium text-white
-              ${
-                isApplied
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-purple-600 hover:bg-indigo-700"
-              }`}
-          >
-            {isApplied ? "Applied" : "Apply Now"}
-          </button>
+              <button
+                onClick={handleApply}
+                disabled={isApplied}
+                className={`rounded-lg px-6 py-2 text-sm font-medium text-white
+                  ${
+                    isApplied
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-indigo-700"
+                  }`}
+              >
+                {isApplied ? "Applied" : "Apply Now"}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </Link>

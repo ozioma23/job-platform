@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 import { Job } from "@/types/job";
 import { getJobs } from "@/lib/api";
 import { Application } from "@/types/application";
@@ -12,18 +18,21 @@ interface JobsContextType {
   category: string;
   location: string;
   experience: string;
+
   setCategory: (value: string) => void;
   setLocation: (value: string) => void;
   setExperience: (value: string) => void;
   clearFilters: () => void;
+
   savedJobs: Job[];
   saveJob: (job: Job) => void;
   unsaveJob: (jobId: string) => void;
-  appliedJobs: Job[];               
-  applyJob: (job: Job) => void;     
-  applications: Application[];
-applyToJob: (job: Job, user: User) => void;
 
+  appliedJobs: Job[];
+  applyJob: (job: Job) => void;
+
+  applications: Application[];
+  applyToJob: (job: Job, user: User) => void;
 }
 
 const JobsContext = createContext<JobsContextType | undefined>(undefined);
@@ -31,15 +40,16 @@ const JobsContext = createContext<JobsContextType | undefined>(undefined);
 export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
   const [experience, setExperience] = useState("");
 
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
-  const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);  
+  const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
 
-  // Fetch jobs on mount
+
   useEffect(() => {
     async function fetchJobs() {
       const data = await getJobs();
@@ -49,13 +59,16 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     fetchJobs();
   }, []);
 
-  // Update filtered jobs when filters change
-  useEffect(() => {
+    useEffect(() => {
     let result = jobs;
 
     if (category) result = result.filter((job) => job.category === category);
-    if (location) result = result.filter((job) => job.location.includes(location));
-    if (experience) result = result.filter((job) => job.experienceLevel === experience);
+    if (location)
+      result = result.filter((job) =>
+        job.location.toLowerCase().includes(location.toLowerCase())
+      );
+    if (experience)
+      result = result.filter((job) => job.experienceLevel === experience);
 
     setFilteredJobs(result);
   }, [category, location, experience, jobs]);
@@ -66,10 +79,26 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     setExperience("");
   };
 
-  const saveJob = (job: Job) => {
+   useEffect(() => {
+    const saved = localStorage.getItem("savedJobs");
+    const applied = localStorage.getItem("appliedJobs");
+
+    if (saved) setSavedJobs(JSON.parse(saved));
+    if (applied) setAppliedJobs(JSON.parse(applied));
+  }, []);
+
+    useEffect(() => {
+    localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
+  }, [savedJobs]);
+
+  useEffect(() => {
+    localStorage.setItem("appliedJobs", JSON.stringify(appliedJobs));
+  }, [appliedJobs]);
+
+   const saveJob = (job: Job) => {
     setSavedJobs((prev) => {
-      if (!prev.find((j) => j.id === job.id)) return [...prev, job];
-      return prev;
+      if (prev.some((j) => j.id === job.id)) return prev;
+      return [...prev, job];
     });
   };
 
@@ -77,18 +106,21 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     setSavedJobs((prev) => prev.filter((job) => job.id !== jobId));
   };
 
-  
-  const applyJob = (job: Job) => {
+    const applyJob = (job: Job) => {
     setAppliedJobs((prev) => {
-      if (!prev.find((j) => j.id === job.id)) return [...prev, job];
-      return prev;
+      if (prev.some((j) => j.id === job.id)) return prev;
+      return [...prev, job];
     });
   };
 
-  const applyToJob = (job: Job, user: User) => {
-  setApplications((prev) => {
-    // Prevent duplicate applications by same user
-    if (!prev.find((app) => app.job.id === job.id && app.user.id === user.id)) {
+   const applyToJob = (job: Job, user: User) => {
+    setApplications((prev) => {
+      const exists = prev.some(
+        (app) => app.job.id === job.id && app.user.id === user.id
+      );
+
+      if (exists) return prev;
+
       return [
         ...prev,
         {
@@ -99,10 +131,8 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
           status: "Pending",
         },
       ];
-    }
-    return prev;
-  });
-};
+    });
+  };
 
   return (
     <JobsContext.Provider
@@ -119,10 +149,10 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
         savedJobs,
         saveJob,
         unsaveJob,
-        appliedJobs,   
-        applyJob,      
-        applications,  
-    applyToJob, 
+        appliedJobs,
+        applyJob,
+        applications,
+        applyToJob,
       }}
     >
       {children}
@@ -130,9 +160,10 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook
 export const useJobs = () => {
   const context = useContext(JobsContext);
-  if (!context) throw new Error("useJobs must be used within a JobsProvider");
+  if (!context) {
+    throw new Error("useJobs must be used within a JobsProvider");
+  }
   return context;
 };
