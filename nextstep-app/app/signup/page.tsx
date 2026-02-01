@@ -16,11 +16,17 @@ export default function SignupPage() {
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newUser = { username: name, email, password };
-    signup(newUser);
-    router.push("/"); 
-  };
+  e.preventDefault();
+
+  signup({
+    id: crypto.randomUUID(),
+    name,
+    email,
+    password,
+  });
+
+  router.push("/");
+};
 
   return (
     <main className="max-w-md mx-auto mt-16 p-6 bg-white rounded-lg shadow-md">
@@ -44,7 +50,7 @@ export default function SignupPage() {
           required
         />
 
-        {/* Password field with eye icon */}
+        
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}

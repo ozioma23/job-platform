@@ -15,3 +15,27 @@ export const capitalize = (str: string) => {
 export const containsIgnoreCase = (str: string, query: string) => {
   return str.toLowerCase().includes(query.toLowerCase());
 };
+
+export function timeAgo(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  const intervals: { [key: string]: number } = {
+    year: 31536000,
+    month: 2592000,
+    week: 604800,
+    day: 86400,
+    hour: 3600,
+    minute: 60,
+  };
+
+  for (const i in intervals) {
+    const interval = Math.floor(seconds / intervals[i]);
+    if (interval >= 1) {
+      return `${interval} ${i}${interval > 1 ? "s" : ""} ago`;
+    }
+  }
+
+  return "Just now";
+}

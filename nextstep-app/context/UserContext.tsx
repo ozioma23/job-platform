@@ -1,12 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode, useState, useEffect } from "react";
-
-interface User {
-  username: string;
-  email: string;
-  password: string;
-}
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
+import { User } from "@/types/user";
 
 interface UserContextType {
   user: User | null;
@@ -20,6 +21,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+
 
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedInUser");
@@ -70,6 +72,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) throw new Error("useUser must be used within UserProvider");
+  if (!context) {
+    throw new Error("useUser must be used within UserProvider");
+  }
   return context;
 };
