@@ -52,7 +52,7 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
   const [appliedJobs, setAppliedJobs] = useState<Job[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
 
-  // ✅ Fetch jobs
+  // Fetch jobs
   useEffect(() => {
     async function fetchJobs() {
       const data = await getJobs();
@@ -62,7 +62,7 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     fetchJobs();
   }, []);
 
-  // ✅ Filters
+  // Filters
   useEffect(() => {
     let result = jobs;
 
@@ -125,7 +125,7 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // ✅ Apply job
+  // Apply job
   const applyJob = (job: Job) => {
     if (!user) return;
 

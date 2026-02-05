@@ -20,7 +20,7 @@ export default function JobFilters({
   onClearFilters,
 }: JobFiltersProps) {
   return (
-    <div className="bg-white p-4 rounded-lg border mb-6">
+    <div className="bg-purple-200 p-4 rounded-lg shadow-md mb-6">
       <h2 className="text-lg font-semibold mb-4">Filter Jobs</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -30,7 +30,7 @@ export default function JobFilters({
           <select
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className="w-full border rounded-md px-3 py-2"
+            className="w-full bg-white border rounded-md px-3 py-2"
           >
             <option value="">All Categories</option>
             <option>Engineering</option>
@@ -46,7 +46,7 @@ export default function JobFilters({
           <select
             value={location}
             onChange={(e) => onLocationChange(e.target.value)}
-            className="w-full border rounded-md px-3 py-2"
+            className="w-full bg-white border rounded-md px-3 py-2"
           >
             <option value="">All Locations</option>
             <option>Lagos</option>
@@ -61,7 +61,7 @@ export default function JobFilters({
           <select
             value={experience}
             onChange={(e) => onExperienceChange(e.target.value)}
-            className="w-full border rounded-md px-3 py-2"
+            className="w-full bg-white border rounded-md px-3 py-2"
           >
             <option value="">All Levels</option>
             <option>Entry</option>
@@ -75,7 +75,7 @@ export default function JobFilters({
       <div className="mt-4 flex justify-end">
         <button
           onClick={onClearFilters}
-          className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+          className="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition"
         >
           Clear Filters
         </button>

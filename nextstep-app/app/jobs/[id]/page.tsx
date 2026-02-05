@@ -5,6 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { useParams } from "next/navigation";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
+import { MapPin, Briefcase, Globe } from "lucide-react";
 import Link from "next/link";
 
 export default function JobDetailsPage() {
@@ -44,104 +45,151 @@ export default function JobDetailsPage() {
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      {/* LEFT CONTENT */}
-      <section className="lg:col-span-2 space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
-          <p className="text-gray-600 mt-1">{job.company}</p>
+    <main className="max-w-7xl mx-auto px-6 py-12">
+      {/* Back link */}
+      <Link
+        href="/"
+        className="text-sm text-gray-500 hover:text-[#5B5AF7]"
+      >
+        ← Back to Job Listings
+      </Link>
 
-          <div className="flex flex-wrap gap-2 mt-3">
-            <Badge>{job.location}</Badge>
-            {job.type && <Badge>{job.type}</Badge>}
-            {job.isRemote && <Badge>Remote</Badge>}
-          </div>
-        </div>
+      {/* Title */}
+      <div className="mt-4 mb-10">
+        <h1 className="text-3xl font-bold text-gray-900">{job.title}</h1>
+        <p className="text-gray-600 mt-1">{job.company}</p>
+      </div>
 
-        {/* Skills */}
-        {job.requirements && (
-          <section>
-            <h2 className="text-lg font-semibold mb-3">Required Skills</h2>
-            <div className="flex flex-wrap gap-2">
-              {job.requirements.map((skill, i) => (
-                <Badge key={i}>{skill}</Badge>
-              ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* LEFT MAIN CONTENT */}
+        <section className="lg:col-span-2 space-y-8">
+          {/* Job Information */}
+          <div className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
+            <h3 className="font-semibold mb-4">Job Information</h3>
+
+            {/* Info rows */}
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex items-center gap-2">
+                <MapPin size={16} className="text-gray-400" />
+                <span>{job.location}</span>
+              </div>
+
+              {job.type && (
+                <div className="flex items-center gap-2">
+                  <Briefcase size={16} className="text-gray-400" />
+                  <span>{job.type}</span>
+                </div>
+              )}
+
+              {job.isRemote && (
+                <div className="flex items-center gap-2">
+                  <Globe size={16} className="text-gray-400" />
+                  <span>Remote</span>
+                </div>
+              )}
             </div>
-          </section>
-        )}
 
-        {/* Description */}
-        <section>
-          <h2 className="text-lg font-semibold mb-2">Job Description</h2>
-          <p className="text-gray-700 leading-relaxed">
-            {job.description}
-          </p>
+            {/* Required Skills  */}
+            {job.requirements && (
+              <>
+                <h4 className="mt-6 mb-3 text-sm font-semibold text-gray-700">
+                  Required Skills
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {job.requirements.map((skill, i) => (
+                    <Badge key={i}>{skill}</Badge>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Job Description */}
+          <div className="rounded-xl bg-white p-6 
+                border border-gray-100 
+                shadow-sm">
+
+            <h3 className="font-semibold">Job Description</h3>
+            <p className="text-gray-700 leading-relaxed">
+              {job.description}
+            </p>
+          </div>
+
+          {job.responsibilities && (
+            <div className="rounded-xl bg-white p-6 
+                border border-gray-100 
+                shadow-sm">
+              <h3 className="font-semibold mb-3">Responsibilities</h3>
+              <ul className="list-disc pl-5 space-y-2 text-gray-700">
+               {/* Responsibilities */}
+           {job.responsibilities.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Qualifications */}
+          {job.qualifications && (
+            <div className="rounded-xl bg-white p-6 
+                border border-gray-100 
+                shadow-sm">
+              <h3 className="font-semibold mb-3">Qualifications</h3>
+              <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                {job.qualifications.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Benefits */}
+          {job.benefits && (
+            <div className="rounded-xl bg-white p-6 
+                border border-gray-100 
+                shadow-sm">
+              <h3 className="font-semibold mb-3">Benefits</h3>
+              <ul className="list-disc pl-5 space-y-2 text-gray-700">
+                {job.benefits.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Apply */}
+          <div>
+            <Button onClick={handleApply} disabled={isApplied}>
+              {isApplied ? "Already Applied" : "Apply Now"}
+            </Button>
+          </div>
         </section>
 
-        {/* Responsibilities */}
-        {job.responsibilities && (
-          <section>
-            <h2 className="text-lg font-semibold mb-2">Responsibilities</h2>
-            <ul className="list-disc pl-5 space-y-1 text-gray-700">
-              {job.responsibilities.map((item, i) => (
-                <li key={i}>{item}</li>
+        {/* RIGHT SIDEBAR */}
+        <aside className="space-y-6">
+          <div className="rounded-xl bg-white p-6 
+                border border-gray-100 
+                shadow-sm">
+
+            <h3 className="font-semibold mb-4">Related Jobs</h3>
+            <ul className="space-y-4">
+              {relatedJobs.slice(0, 4).map((job) => (
+                <li key={job.id}>
+                  <Link
+                    href={`/jobs/${job.id}`}
+                    className="block hover:text-[#5B5AF7]"
+                  >
+                    <p className="text-sm font-medium">{job.title}</p>
+                    <p className="text-xs text-gray-500">
+                      {job.company}
+                    </p>
+                  </Link>
+                </li>
               ))}
             </ul>
-          </section>
-        )}
-
-        {/* Benefits */}
-        <section>
-          <h2 className="text-lg font-semibold mb-2">Benefits</h2>
-          <ul className="list-disc pl-5 space-y-1 text-gray-700">
-            <li>Competitive salary</li>
-            <li>Flexible working hours</li>
-            <li>Health insurance</li>
-            <li>Career growth opportunities</li>
-          </ul>
-        </section>
-
-        {/* Apply Button */}
-        <div className="pt-6">
-          <Button onClick={handleApply} disabled={isApplied}>
-            {isApplied ? "Already Applied" : "Apply Now"}
-          </Button>
-        </div>
-      </section>
-
-      {/* RIGHT SIDEBAR */}
-      <aside className="space-y-6">
-        {/* Job Info */}
-        <div className="border rounded-lg p-6 bg-white">
-          <h3 className="font-semibold mb-4">Job Information</h3>
-          <ul className="text-sm space-y-2 text-gray-600">
-            <li><strong>Location:</strong> {job.location}</li>
-            <li><strong>Job Type:</strong> {job.type}</li>
-            <li><strong>Experience:</strong> {job.experienceLevel}</li>
-            <li><strong>Posted:</strong> {job.postedAt}</li>
-          </ul>
-        </div>
-
-        {/* Related Jobs */}
-        <div className="border rounded-lg p-6 bg-white">
-          <h3 className="font-semibold mb-4">Related Jobs</h3>
-          <ul className="space-y-3">
-            {relatedJobs.slice(0, 4).map((job) => (
-              <li key={job.id}>
-                <Link
-                  href={`/jobs/${job.id}`}
-                  className="block text-sm hover:text-[#5B5AF7]"
-                >
-                  {job.title}
-                  <p className="text-xs text-gray-500">{job.company}</p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </aside>
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

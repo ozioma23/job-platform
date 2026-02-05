@@ -10,7 +10,10 @@ export interface Job {
   description?: string;
   responsibilities?: string[];
   requirements?: string[];
-  type?: string;       
-  salary?: string;    
-  postedAt?: string;  
+  qualifications?: string[];
+  benefits?: string[];
+
+  type?: string;
+  salary?: string;
+  postedAt?: string;
 }
