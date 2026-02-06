@@ -13,23 +13,20 @@ const JobList: React.FC<JobListProps> = ({
 }) => {
   if (jobs.length === 0) {
     return (
-      <p className="col-span-full text-center text-gray-500 mt-10">
+      <p className="col-span-full text-center text-gray-500 mt-10 px-4">
         No jobs available at the moment.
       </p>
     );
   }
 
   return (
-<div
-  className={`grid gap-6 ${
-    variant === "saved"
-      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-      : "grid-cols-1 md:grid-cols-2"
-  }`}
->
-
-
-
+    <div
+      className={`grid gap-4 sm:gap-6 ${
+        variant === "saved"
+          ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          : "grid-cols-1 md:grid-cols-2"
+      }`}
+    >
       {jobs.map((job) => (
         <JobCard
           key={job.id}
