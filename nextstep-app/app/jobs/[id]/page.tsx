@@ -9,12 +9,14 @@ import { MapPin, Briefcase, Globe } from "lucide-react";
 import Link from "next/link";
 
 export default function JobDetailsPage() {
-  const { filteredJobs, appliedJobs, applyJob } = useJobs();
+ const { jobs, filteredJobs, appliedJobs, applyJob, applyToJob } = useJobs();
+
   const { user } = useUser();
   const params = useParams();
   const jobId = params.id as string;
 
-  const job = filteredJobs.find((j) => j.id === jobId);
+  const job = jobs.find((j) => j.id === jobId);
+
 
   if (!job) {
     return (
@@ -34,15 +36,16 @@ export default function JobDetailsPage() {
   );
 
   const handleApply = () => {
-    if (!user) {
-      alert("Please log in to apply.");
-      return;
-    }
-    if (!isApplied) {
-      applyJob(job);
-      alert("Application submitted!");
-    }
-  };
+  if (!user) {
+    alert("Please log in to apply.");
+    return;
+  }
+  if (!isApplied) {
+    applyJob(job);         
+    applyToJob(job, user);
+    alert("Application submitted!");
+  }
+};
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -147,7 +150,7 @@ export default function JobDetailsPage() {
           </div>
         </section>
 
-        {/* RIGHT SIDEBAR */}
+      
         <aside className="space-y-6 mt-6 lg:mt-0">
           <div className="rounded-xl bg-white p-4 sm:p-6 border border-gray-100 shadow-sm">
             <h3 className="font-semibold mb-4">Related Jobs</h3>

@@ -4,33 +4,43 @@ import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-/* ========= ADDED: storage helpers ========= */
-const loadProfileData = () => {
-  if (typeof window === "undefined") return null;
-  const data = localStorage.getItem("profileData");
+const loadProfileData = (userId: string | null) => {
+  if (typeof window === "undefined" || !userId) return null;
+  const data = localStorage.getItem(`profileData-${userId}`);
   return data ? JSON.parse(data) : null;
 };
 
-const saveProfileData = (data: any) => {
-  localStorage.setItem("profileData", JSON.stringify(data));
+const saveProfileData = (userId: string | null, data: any) => {
+  if (!userId) return;
+  localStorage.setItem(`profileData-${userId}`, JSON.stringify(data));
 };
 
 export default function ProfilePage() {
   const { user, logout, updateUser } = useUser();
   const router = useRouter();
 
+  const [loadingUser, setLoadingUser] = useState(true);
+
   useEffect(() => {
-    if (!user) router.push("/login");
-  }, [user, router]);
+    setLoadingUser(false);
+  }, []);
 
-  const stored = loadProfileData();
+  useEffect(() => {
+    if (!loadingUser && !user) {
+      router.push("/login");
+    }
+  }, [user, loadingUser, router]);
 
-  /* ========= ADDED: enhanced state ========= */
-  const [editingProfile, setEditingProfile] = useState(false);
-  const [username, setUsername] = useState(user?.username || "");
+  // Load profile data for current user
+  const stored = loadProfileData(user?.id || null);
 
   const [avatar, setAvatar] = useState(stored?.avatar || "");
-
+  const [username, setUsername] = useState(user?.username || "");
+  const [passwords, setPasswords] = useState({
+    current: "",
+    newPassword: "",
+    confirm: "",
+  });
   const [skills, setSkills] = useState<string[]>(
     stored?.skills || [
       "React",
@@ -43,7 +53,6 @@ export default function ProfilePage() {
       "Communication",
     ]
   );
-
   const [experience, setExperience] = useState<any[]>(
     stored?.experience || [
       {
@@ -59,161 +68,160 @@ export default function ProfilePage() {
     ]
   );
 
-  const [showSkillsModal, setShowSkillsModal] = useState(false);
+  const [newExperience, setNewExperience] = useState({
+    role: "",
+    company: "",
+    period: "",
+  });
 
-  /* ========= ADDED: auto-persist ========= */
+  const [showSkillsModal, setShowSkillsModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingChoice, setEditingChoice] = useState<"username" | "password" | null>(null);
+
+  // Save profile data whenever it changes for current user
   useEffect(() => {
-    saveProfileData({
-      avatar,
-      skills,
-      experience,
-    });
-  }, [avatar, skills, experience]);
+    if (user) {
+      saveProfileData(user.id, { avatar, skills, experience });
+    }
+  }, [avatar, skills, experience, user]);
+
+  // Clear profile data when user logs out
+  useEffect(() => {
+    if (!user) {
+      setAvatar("");
+      setUsername("");
+      setSkills([]);
+      setExperience([]);
+    }
+  }, [user]);
 
   if (!user) return null;
 
-  return (
-    <div className="min-h-[80vh] bg-gray-50 py-12">
-      <div className="mx-auto max-w-5xl px-6">
+  const handleUsernameSave = () => {
+    if (!username.trim()) {
+      alert("Username cannot be empty!");
+      return;
+    }
+    updateUser({ ...user, username });
+    setEditingChoice(null);
+    setShowEditModal(false);
+  };
 
-        {/* Title */}
-        <h1 className="mb-8 text-2xl font-semibold text-gray-900">
-          Profile
+  const handlePasswordSave = () => {
+    if (!passwords.current || !passwords.newPassword || !passwords.confirm) {
+      alert("All password fields are required!");
+      return;
+    }
+
+    if (passwords.newPassword !== passwords.confirm) {
+      alert("New password and confirm password do not match!");
+      return;
+    }
+
+    alert("Password changed successfully!");
+    setPasswords({ current: "", newPassword: "", confirm: "" });
+    setEditingChoice(null);
+    setShowEditModal(false);
+  };
+
+  const handleAddExperience = () => {
+    if (!newExperience.role || !newExperience.company || !newExperience.period) return;
+    setExperience([...experience, newExperience]);
+    setNewExperience({ role: "", company: "", period: "" });
+  };
+
+  // ------------------ RENDER ------------------
+  return (
+    <div className="min-h-[80vh] bg-gray-50 py-6 sm:py-12">
+      <div className="mx-auto max-w-3xl sm:max-w-5xl px-4 sm:px-6 space-y-6">
+
+        {/* Page Title */}
+        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 text-center sm:text-left">
+          My Profile
         </h1>
 
-        {/* ================= PERSONAL INFO ================= */}
-        <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-          <div className="flex items-start justify-between">
-            <h2 className="text-sm font-semibold text-gray-700">
-              Personal Information
-            </h2>
-
-            {editingProfile ? (
-              <button
-                onClick={() => {
-                  updateUser({ ...user, username });
-                  setEditingProfile(false);
-                }}
-                className="rounded-md bg-purple-600 px-4 py-1.5 text-sm text-white"
-              >
-                Save
-              </button>
-            ) : (
-              <button
-                onClick={() => setEditingProfile(true)}
-                className="rounded-md border px-4 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
-              >
-                Edit Profile
-              </button>
-            )}
-          </div>
-
-          <div className="mt-6 flex items-center gap-5">
-
-            {/* ========= ADDED: avatar upload ========= */}
-            <div className="relative">
-              <label className="cursor-pointer">
-                {avatar ? (
-                  <img
-                    src={avatar}
-                    className="h-16 w-16 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-700 text-xl font-bold text-white">
-                    {user.username.charAt(0).toUpperCase()}
-                  </div>
-                )}
-
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = () =>
-                      setAvatar(reader.result as string);
-                    reader.readAsDataURL(file);
-                  }}
-                />
-              </label>
-            </div>
-
-            <div>
-              {editingProfile ? (
-                <input
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="border rounded px-3 py-1 text-sm"
-                />
+        {/* ================= USERNAME CARD ================= */}
+        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <label className="cursor-pointer flex-shrink-0">
+              {avatar ? (
+                <img src={avatar} className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover" />
               ) : (
-                <p className="font-semibold text-gray-900">
-                  {user.username}
-                </p>
+                <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-purple-700 text-lg sm:text-xl font-bold text-white">
+                  {user.username.charAt(0).toUpperCase()}
+                </div>
               )}
-              <p className="text-sm text-gray-500">{user.email}</p>
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => setAvatar(reader.result as string);
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-gray-900 text-base sm:text-lg">{user.username}</p>
+              <p className="text-gray-500 text-sm sm:text-base">{user.email}</p>
             </div>
           </div>
+          <button
+            onClick={() => setShowEditModal(true)}
+            className="rounded-md border px-4 py-1.5 text-sm sm:text-base text-gray-600 hover:bg-gray-50 mt-2 sm:mt-0"
+          >
+            Edit Profile
+          </button>
         </div>
 
-        {/* ================= SKILLS ================= */}
-        <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-          <div className="flex items-start justify-between">
-            <h2 className="text-sm font-semibold text-gray-700">
-              Skills
-            </h2>
 
+        {/* ================= WORK EXPERIENCE CARD ================= */}
+        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h2 className="text-sm sm:text-base font-semibold text-gray-700">Work Experience</h2>
             <button
-              onClick={() => setShowSkillsModal(true)}
-              className="rounded-md border px-4 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+              onClick={handleAddExperience}
+              className="rounded-md bg-purple-600 px-3 py-1.5 text-sm sm:text-base text-white"
             >
-              Manage Skills
+              Add Experience
             </button>
           </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {skills.map((skill) => (
-              <span
-                key={skill}
-                className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700"
-              >
-                {skill}
-              </span>
-            ))}
+          {/* Inputs */}
+          <div className="flex flex-col sm:flex-row gap-2 mt-2">
+            <input
+              placeholder="Role"
+              value={newExperience.role}
+              onChange={(e) => setNewExperience({ ...newExperience, role: e.target.value })}
+              className="border rounded px-3 py-1 text-sm sm:text-base flex-1"
+            />
+            <input
+              placeholder="Company"
+              value={newExperience.company}
+              onChange={(e) => setNewExperience({ ...newExperience, company: e.target.value })}
+              className="border rounded px-3 py-1 text-sm sm:text-base flex-1"
+            />
+            <input
+              placeholder="Period"
+              value={newExperience.period}
+              onChange={(e) => setNewExperience({ ...newExperience, period: e.target.value })}
+              className="border rounded px-3 py-1 text-sm sm:text-base flex-1"
+            />
           </div>
-        </div>
-
-        {/* ================= EXPERIENCE ================= */}
-        <div className="mb-6 rounded-xl bg-white p-6 shadow-sm">
-          <div className="flex items-start justify-between">
-            <h2 className="text-sm font-semibold text-gray-700">
-              Work Experience
-            </h2>
-          </div>
-
-          <div className="mt-5 space-y-5">
+          {/* Experience List */}
+          <div className="mt-4 space-y-3">
             {experience.map((exp, i) => (
-              <div key={i} className="border-t pt-4 flex justify-between">
+              <div key={i} className="border-t pt-2 flex flex-col sm:flex-row sm:justify-between gap-2">
                 <div>
-                  <p className="font-medium text-gray-900">
-                    {exp.role}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {exp.company}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {exp.period}
-                  </p>
+                  <p className="font-medium text-gray-900 text-sm sm:text-base">{exp.role}</p>
+                  <p className="text-gray-500 text-xs sm:text-sm">{exp.company}</p>
+                  <p className="text-gray-400 text-xs">{exp.period}</p>
                 </div>
-
                 <button
-                  onClick={() =>
-                    setExperience(
-                      experience.filter((_, idx) => idx !== i)
-                    )
-                  }
-                  className="text-red-500 text-sm"
+                  onClick={() => setExperience(experience.filter((_, idx) => idx !== i))}
+                  className="text-red-500 text-sm mt-1 sm:mt-0"
                 >
                   Delete
                 </button>
@@ -222,23 +230,35 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ================= SECURITY ================= */}
-        <div className="rounded-xl bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-sm font-semibold text-gray-700">
-            Security Settings
-          </h2>
-
-          <div className="space-y-3 text-sm text-gray-700">
-            <button className="block hover:text-purple-700">
-              Change Password
-            </button>
-            <button className="block hover:text-purple-700">
-              Two-Factor Authentication
-            </button>
+        {/* ================= SKILLS CARD ================= */}
+        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <h2 className="text-sm sm:text-base font-semibold text-gray-700">My Skills</h2>
             <button
-              onClick={logout}
-              className="block text-red-600 hover:text-red-700"
+              onClick={() => setShowSkillsModal(true)}
+              className="rounded-md border px-4 py-1.5 text-sm sm:text-base text-gray-600 hover:bg-gray-50 mt-2 sm:mt-0"
             >
+              Edit
+            </button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {skills.map((skill) => (
+              <span
+                key={skill}
+                className="rounded-full bg-purple-100 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-purple-700"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* ================= SECURITY CARD ================= */}
+        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm">
+          <h2 className="mb-3 text-sm sm:text-base font-semibold text-gray-700">Security Settings</h2>
+          <div className="space-y-2 text-sm sm:text-base">
+            <button className="block hover:text-purple-700">Two-Factor Authentication</button>
+            <button onClick={logout} className="block text-red-600 hover:text-red-700">
               Logout
             </button>
           </div>
@@ -246,36 +266,22 @@ export default function ProfilePage() {
 
         {/* ================= SKILLS MODAL ================= */}
         {showSkillsModal && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div className="bg-white rounded-xl p-6 w-96 shadow-lg">
-              <h3 className="font-semibold mb-4">
-                Manage Skills
-              </h3>
-
-              <div className="space-y-2">
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-xl p-6 w-full max-w-sm sm:max-w-md shadow-lg">
+              <h3 className="font-semibold mb-4 text-sm sm:text-base">Manage Skills</h3>
+              <div className="space-y-2 text-sm sm:text-base">
                 {skills.map((skill) => (
-                  <div
-                    key={skill}
-                    className="flex justify-between text-sm"
-                  >
+                  <div key={skill} className="flex justify-between">
                     {skill}
-                    <button
-                      onClick={() =>
-                        setSkills(
-                          skills.filter((s) => s !== skill)
-                        )
-                      }
-                      className="text-red-500"
-                    >
+                    <button onClick={() => setSkills(skills.filter((s) => s !== skill))} className="text-red-500">
                       remove
                     </button>
                   </div>
                 ))}
               </div>
-
               <input
                 placeholder="New skill"
-                className="mt-4 w-full border rounded px-3 py-2 text-sm"
+                className="mt-3 w-full border rounded px-3 py-2 text-sm sm:text-base"
                 onKeyDown={(e: any) => {
                   if (e.key === "Enter") {
                     setSkills([...skills, e.target.value]);
@@ -283,13 +289,117 @@ export default function ProfilePage() {
                   }
                 }}
               />
-
               <button
                 onClick={() => setShowSkillsModal(false)}
-                className="mt-4 w-full bg-purple-600 text-white rounded py-2"
+                className="mt-3 w-full bg-purple-600 text-white rounded py-2 text-sm sm:text-base"
               >
                 Done
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* ================= EDIT PROFILE MODAL ================= */}
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-xl p-6 w-full max-w-sm sm:max-w-md shadow-lg">
+              {!editingChoice && (
+                <>
+                  <h3 className="font-semibold mb-4 text-sm sm:text-base">Edit Profile</h3>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => setEditingChoice("username")}
+                      className="w-full border rounded py-2 text-sm sm:text-base"
+                    >
+                      Edit Username
+                    </button>
+                    <button
+                      onClick={() => setEditingChoice("password")}
+                      className="w-full border rounded py-2 text-sm sm:text-base"
+                    >
+                      Change Password
+                    </button>
+                    <button
+                      onClick={() => setShowEditModal(false)}
+                      className="w-full mt-2 bg-gray-200 rounded py-2 text-sm sm:text-base"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {editingChoice === "username" && (
+                <>
+                  <h3 className="font-semibold mb-4 text-sm sm:text-base">Edit Username</h3>
+                  <input
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full border rounded px-3 py-2 text-sm sm:text-base mb-4"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleUsernameSave}
+                      className="flex-1 bg-purple-600 text-white rounded py-2 text-sm sm:text-base"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setUsername(user.username);
+                        setEditingChoice(null);
+                      }}
+                      className="flex-1 border rounded py-2 text-sm sm:text-base"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {editingChoice === "password" && (
+                <>
+                  <h3 className="font-semibold mb-4 text-sm sm:text-base">Change Password</h3>
+                  <input
+                    type="password"
+                    placeholder="Current password"
+                    value={passwords.current}
+                    onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                    className="w-full border rounded px-3 py-2 text-sm sm:text-base mb-2"
+                  />
+                  <input
+                    type="password"
+                    placeholder="New password"
+                    value={passwords.newPassword}
+                    onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                    className="w-full border rounded px-3 py-2 text-sm sm:text-base mb-2"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirm new password"
+                    value={passwords.confirm}
+                    onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                    className="w-full border rounded px-3 py-2 text-sm sm:text-base mb-4"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handlePasswordSave}
+                      className="flex-1 bg-purple-600 text-white rounded py-2 text-sm sm:text-base"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setPasswords({ current: "", newPassword: "", confirm: "" });
+                        setEditingChoice(null);
+                      }}
+                      className="flex-1 border rounded py-2 text-sm sm:text-base"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

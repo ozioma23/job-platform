@@ -126,37 +126,38 @@ export const JobsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Apply job
-  const applyJob = (job: Job) => {
-    if (!user) return;
+const applyJob = (job: Job) => {
+  if (!user) return;
 
-    setAppliedJobs((prev) => {
-      if (prev.some((j) => j.id === job.id)) return prev;
-      const updated = [...prev, job];
-      localStorage.setItem(`appliedJobs_${user.id}`, JSON.stringify(updated));
-      return updated;
-    });
-  };
+  setAppliedJobs((prev) => {
+    if (prev.some((j) => j.id === job.id)) return prev; // already applied
+    const updated = [...prev, job];
+    localStorage.setItem(`appliedJobs_${user.id}`, JSON.stringify(updated));
+    return updated;
+  });
+};
 
-  const applyToJob = (job: Job, user: User) => {
-    setApplications((prev) => {
-      const exists = prev.some(
-        (app) => app.job.id === job.id && app.user.id === user.id
-      );
+// Apply to applications list
+const applyToJob = (job: Job, user: User) => {
+  setApplications((prev) => {
+    const exists = prev.some(
+      (app) => app.job.id === job.id && app.user.id === user.id
+    );
 
-      if (exists) return prev;
+    if (exists) return prev;
 
-      return [
-        ...prev,
-        {
-          id: `${job.id}-${user.id}`,
-          job,
-          user,
-          appliedAt: new Date().toISOString(),
-          status: "Pending",
-        },
-      ];
-    });
-  };
+    return [
+      ...prev,
+      {
+        id: `${job.id}-${user.id}`,
+        job,
+        user,
+        appliedAt: new Date().toISOString(),
+        status: "Pending",
+      },
+    ];
+  });
+};
 
   return (
     <JobsContext.Provider

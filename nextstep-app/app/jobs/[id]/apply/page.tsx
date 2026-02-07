@@ -16,6 +16,7 @@ export default function ApplyJobPage() {
 
   const [message, setMessage] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [fileName, setFileName] = useState("");
 
   if (!job) return <p>Job not found</p>;
   if (!user) return <p>Please log in to apply</p>;
@@ -31,8 +32,8 @@ export default function ApplyJobPage() {
     setSubmitted(true);
 
     setTimeout(() => {
-  router.push(`/jobs/${job.id}`);
-}, 2000);
+      router.push(`/jobs/${job.id}`);
+    }, 2000);
 
   };
 
@@ -60,7 +61,7 @@ export default function ApplyJobPage() {
           type="text"
           required
           placeholder="Full Name"
-          defaultValue={user.name}
+          defaultValue={user.username}
           className="w-full border rounded p-3"
         />
 
@@ -79,10 +80,22 @@ export default function ApplyJobPage() {
         />
 
         <input
+          id="cvUpload"
           type="file"
           accept=".pdf,.doc,.docx"
-          className="w-full"
+          className="hidden"
+          onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+              setFileName(e.target.files[0].name);
+            }
+          }}
         />
+        <label
+          htmlFor="cvUpload"
+          className="cursor-pointer w-full bg-white  text-purple-600 mb-4 px-4 py-2 rounded text-center hover:text-purple-500"
+        >
+          {fileName ? `CV: ${fileName}` : "Upload Your CV"}
+        </label>
 
         <button
           type="submit"

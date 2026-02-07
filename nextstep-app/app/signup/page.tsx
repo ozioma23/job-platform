@@ -20,7 +20,7 @@ export default function SignupPage() {
 
   signup({
     id: crypto.randomUUID(),
-    name,
+   username: name, 
     email,
     password,
   });

@@ -22,30 +22,42 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-
+  // Load logged-in user on mount
   useEffect(() => {
     const savedUser = localStorage.getItem("loggedInUser");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
 
   const signup = (newUser: User) => {
-    localStorage.setItem("registeredUser", JSON.stringify(newUser));
-    localStorage.setItem("loggedInUser", JSON.stringify(newUser));
+    // Load existing users array or empty
+    const storedUsers = localStorage.getItem("registeredUsers");
+    const users: User[] = storedUsers ? JSON.parse(storedUsers) : [];
+
+    // Add new user
+    users.push(newUser);
+
+    // Save updated array
+    localStorage.setItem("registeredUsers", JSON.stringify(users));
+
+    // Set as logged in
     setUser(newUser);
+    localStorage.setItem("loggedInUser", JSON.stringify(newUser));
+
     return true;
   };
 
   const login = (email: string, password: string) => {
-    const storedUser = localStorage.getItem("registeredUser");
-    if (!storedUser) return false;
+    const storedUsers = localStorage.getItem("registeredUsers");
+    if (!storedUsers) return false;
 
-    const parsedUser: User = JSON.parse(storedUser);
+    const users: User[] = JSON.parse(storedUsers);
+    const foundUser = users.find(
+      (u) => u.email === email && u.password === password
+    );
 
-    if (parsedUser.email === email && parsedUser.password === password) {
-      setUser(parsedUser);
-      localStorage.setItem("loggedInUser", JSON.stringify(parsedUser));
+    if (foundUser) {
+      setUser(foundUser);
+      localStorage.setItem("loggedInUser", JSON.stringify(foundUser));
       return true;
     }
 
@@ -60,7 +72,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const updateUser = (updatedUser: User) => {
     setUser(updatedUser);
     localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-    localStorage.setItem("registeredUser", JSON.stringify(updatedUser));
+
+    // Update in registeredUsers array
+    const storedUsers = localStorage.getItem("registeredUsers");
+    const users: User[] = storedUsers ? JSON.parse(storedUsers) : [];
+    const index = users.findIndex((u) => u.id === updatedUser.id);
+    if (index !== -1) {
+      users[index] = updatedUser;
+      localStorage.setItem("registeredUsers", JSON.stringify(users));
+    }
   };
 
   return (
@@ -72,8 +92,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within UserProvider");
-  }
+  if (!context) throw new Error("useUser must be used within UserProvider");
   return context;
 };
