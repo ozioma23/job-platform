@@ -9,17 +9,19 @@ export default function SavedJobsPage() {
 
   if (savedJobs.length === 0) {
     return (
-      <p className="text-center mt-10 text-gray-500">
+      <p className="text-center mt-10 px-4 text-gray-500">
         No saved jobs yet.
       </p>
     );
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold mb-6">Saved Jobs</h1>
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <h1 className="text-xl sm:text-2xl font-bold mb-6">
+        Saved Jobs
+      </h1>
 
-            <JobList jobs={savedJobs} variant="saved" />
+      <JobList jobs={savedJobs} variant="saved" />
     </main>
   );
 }

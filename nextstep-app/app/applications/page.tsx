@@ -2,6 +2,8 @@
 
 import React from "react";
 import { useJobs } from "@/context/JobsContext";
+import { ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function getStatusStyle(status: string) {
   switch (status) {
@@ -18,6 +20,18 @@ function getStatusStyle(status: string) {
 
 export default function ApplicationsPage() {
   const { appliedJobs } = useJobs();
+  const router = useRouter();
+
+  const handleDesktopClick = (jobId: string) => {
+    if (window.innerWidth >= 640) {
+      router.push(`/jobs/${jobId}`);
+    }
+  };
+
+  const handleArrowClick = (jobId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/jobs/${jobId}`);
+  };
 
   return (
     <main className="max-w-4xl mx-auto px-6 py-10">
@@ -34,32 +48,38 @@ export default function ApplicationsPage() {
           {appliedJobs.map((job) => (
             <div
               key={job.id}
-              className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition"
+              className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition cursor-pointer"
+              onClick={() => handleDesktopClick(job.id)}
             >
               <div className="flex items-start justify-between">
-                
-                                <div>
-                  <h3 className="font-semibold text-gray-900">
+                <div>
+
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
                     {job.title}
                   </h3>
 
-                  <p className="text-sm text-gray-600 mt-1">
-                    {job.company}
-                  </p>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">{job.company}</p>
 
-                  <p className="text-xs text-gray-400 mt-2">
+
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-2">
                     Applied recently
                   </p>
                 </div>
 
-                              <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full ${getStatusStyle(
-                    "Applied"
-                  )}`}
-                >
-                  Applied
-                </span>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`text-xs font-medium px-3 py-1 rounded-full ${getStatusStyle(
+                      "Applied"
+                    )}`}
+                  >
+                    Applied
+                  </span>
 
+                  <ChevronRight
+                    className="w-4 h-4 text-gray-400 block sm:hidden cursor-pointer"
+                    onClick={(e) => handleArrowClick(job.id, e)}
+                  />
+                </div>
               </div>
             </div>
           ))}
