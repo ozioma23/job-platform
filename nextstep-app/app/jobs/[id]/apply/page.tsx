@@ -9,7 +9,8 @@ export default function ApplyJobPage() {
   const { id } = useParams();
   const router = useRouter();
 
-  const { jobs, applyToJob, applications } = useJobs();
+  const { jobs, applyToJob, applyJob, applications } = useJobs();
+
   const { user } = useUser();
 
   const job = jobs.find((j) => j.id === id);
@@ -25,17 +26,19 @@ export default function ApplyJobPage() {
     (app) => app.job.id === job.id && app.user.id === user.id
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
 
-    applyToJob(job, user);
-    setSubmitted(true);
+  applyJob(job);
+  applyToJob(job, user);
 
-    setTimeout(() => {
-      router.push(`/jobs/${job.id}`);
-    }, 2000);
+  setSubmitted(true);
 
-  };
+  setTimeout(() => {
+    router.push(`/jobs/${job.id}`);
+  }, 2000);
+};
+
 
   if (alreadyApplied || submitted) {
     return (

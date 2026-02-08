@@ -7,12 +7,16 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { MapPin, Briefcase, Globe } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 
 export default function JobDetailsPage() {
  const { jobs, filteredJobs, appliedJobs, applyJob, applyToJob } = useJobs();
 
   const { user } = useUser();
   const params = useParams();
+  const router = useRouter();
+
   const jobId = params.id as string;
 
   const job = jobs.find((j) => j.id === jobId);
@@ -40,12 +44,10 @@ export default function JobDetailsPage() {
     alert("Please log in to apply.");
     return;
   }
-  if (!isApplied) {
-    applyJob(job);         
-    applyToJob(job, user);
-    alert("Application submitted!");
-  }
+
+  router.push(`/jobs/${job.id}/apply`);
 };
+
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

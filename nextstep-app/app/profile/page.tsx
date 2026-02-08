@@ -31,42 +31,16 @@ export default function ProfilePage() {
     }
   }, [user, loadingUser, router]);
 
-  // Load profile data for current user
-  const stored = loadProfileData(user?.id || null);
-
-  const [avatar, setAvatar] = useState(stored?.avatar || "");
-  const [username, setUsername] = useState(user?.username || "");
+  // ------------------ STATE ------------------
+  const [avatar, setAvatar] = useState("");
+  const [username, setUsername] = useState("");
   const [passwords, setPasswords] = useState({
     current: "",
     newPassword: "",
     confirm: "",
   });
-  const [skills, setSkills] = useState<string[]>(
-    stored?.skills || [
-      "React",
-      "TypeScript",
-      "Tailwind CSS",
-      "UI/UX Design",
-      "Project Management",
-      "Agile Methodologies",
-      "Problem Solving",
-      "Communication",
-    ]
-  );
-  const [experience, setExperience] = useState<any[]>(
-    stored?.experience || [
-      {
-        role: "Senior Frontend Developer",
-        company: "Tech Innovations Inc.",
-        period: "Jan 2022 – Present",
-      },
-      {
-        role: "Junior UI Engineer",
-        company: "Creative Solutions LLC",
-        period: "Jul 2019 – Dec 2021",
-      },
-    ]
-  );
+  const [skills, setSkills] = useState<string[]>([]);
+  const [experience, setExperience] = useState<any[]>([]);
 
   const [newExperience, setNewExperience] = useState({
     role: "",
@@ -78,14 +52,33 @@ export default function ProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingChoice, setEditingChoice] = useState<"username" | "password" | null>(null);
 
-  // Save profile data whenever it changes for current user
+
+  useEffect(() => {
+    if (!user) return;
+
+    const stored = loadProfileData(user.id);
+
+    if (stored) {
+      setAvatar(stored.avatar || "");
+      setSkills(stored.skills || []);
+      setExperience(stored.experience || []);
+    } else {
+      setAvatar("");
+      setSkills([]);
+      setExperience([]);
+    }
+
+    setUsername(user.username || "");
+  }, [user]);
+
+  
   useEffect(() => {
     if (user) {
       saveProfileData(user.id, { avatar, skills, experience });
     }
   }, [avatar, skills, experience, user]);
 
-  // Clear profile data when user logs out
+  
   useEffect(() => {
     if (!user) {
       setAvatar("");
@@ -130,17 +123,16 @@ export default function ProfilePage() {
     setNewExperience({ role: "", company: "", period: "" });
   };
 
-  // ------------------ RENDER ------------------
+ 
   return (
     <div className="min-h-[80vh] bg-gray-50 py-6 sm:py-12">
       <div className="mx-auto max-w-3xl sm:max-w-5xl px-4 sm:px-6 space-y-6">
 
-        {/* Page Title */}
         <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 text-center sm:text-left">
           My Profile
         </h1>
 
-        {/* ================= USERNAME CARD ================= */}
+       
         <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <label className="cursor-pointer flex-shrink-0">
@@ -177,9 +169,7 @@ export default function ProfilePage() {
           </button>
         </div>
 
-
-        {/* ================= WORK EXPERIENCE CARD ================= */}
-        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm flex flex-col gap-4">
+              <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h2 className="text-sm sm:text-base font-semibold text-gray-700">Work Experience</h2>
             <button
@@ -189,7 +179,7 @@ export default function ProfilePage() {
               Add Experience
             </button>
           </div>
-          {/* Inputs */}
+          
           <div className="flex flex-col sm:flex-row gap-2 mt-2">
             <input
               placeholder="Role"
@@ -210,7 +200,7 @@ export default function ProfilePage() {
               className="border rounded px-3 py-1 text-sm sm:text-base flex-1"
             />
           </div>
-          {/* Experience List */}
+        
           <div className="mt-4 space-y-3">
             {experience.map((exp, i) => (
               <div key={i} className="border-t pt-2 flex flex-col sm:flex-row sm:justify-between gap-2">
@@ -230,8 +220,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ================= SKILLS CARD ================= */}
-        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm">
+              <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <h2 className="text-sm sm:text-base font-semibold text-gray-700">My Skills</h2>
             <button
@@ -253,8 +242,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ================= SECURITY CARD ================= */}
-        <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm">
+                <div className="rounded-xl bg-white p-4 sm:p-6 shadow-sm">
           <h2 className="mb-3 text-sm sm:text-base font-semibold text-gray-700">Security Settings</h2>
           <div className="space-y-2 text-sm sm:text-base">
             <button className="block hover:text-purple-700">Two-Factor Authentication</button>
@@ -264,8 +252,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ================= SKILLS MODAL ================= */}
-        {showSkillsModal && (
+              {showSkillsModal && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
             <div className="bg-white rounded-xl p-6 w-full max-w-sm sm:max-w-md shadow-lg">
               <h3 className="font-semibold mb-4 text-sm sm:text-base">Manage Skills</h3>
@@ -299,8 +286,7 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ================= EDIT PROFILE MODAL ================= */}
-        {showEditModal && (
+               {showEditModal && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
             <div className="bg-white rounded-xl p-6 w-full max-w-sm sm:max-w-md shadow-lg">
               {!editingChoice && (
